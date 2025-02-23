@@ -1,6 +1,6 @@
-
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres"]
 }
 
 datasource db {
@@ -9,10 +9,32 @@ datasource db {
 }
 
 model User {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name String?
-  email String @unique
-  password String?
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String?
+  email      String    @unique
+  password   String?
+  post       Post[]
+  comment    Comment[]
+  created_at DateTime  @default(now())
+}
+
+model Post {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user          User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id       String    @db.Uuid
+  title         String
+  description   String
+  comment_count Int       @default(0)
+  comment       Comment[]
+  created_at    DateTime  @default(now())
+}
+
+model Comment {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  post       Post     @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  post_id    String   @db.Uuid
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id    String   @db.Uuid
+  comment    String
   created_at DateTime @default(now())
-  
 }
